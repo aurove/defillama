@@ -20,7 +20,7 @@ https://www.aurove.xyz
 https://raw.githubusercontent.com/aurove/defillama/main/assets/aurove.png
 
 ##### Current TVL:
-~$1.7k (Ledger avBTCm + avMEZOm supplies valued as Mezo BTC + MEZO)
+~$1.7k (Ledger avBTCm + avMEZOm supplies as locked Mezo BTC + MEZO)
 
 ##### Treasury Addresses (if the protocol has treasury)
 
@@ -45,13 +45,14 @@ Aurove turns Mezo Earn veBTC / veMEZO managed locks into fungible liquid claims 
 Liquid Staking
 
 ##### Oracle Provider(s): Specify the oracle(s) used (e.g., Chainlink, Band, API3, TWAP, etc.):
-None for TVL. Shares are minted 1:1 with locked underlying on Mezo Earn managed veNFTs.
+None for TVL. Shares mint 1:1 with locked underlying. Liquid-token market prices are from Mezo CL pools (avBTCm vs MUSD; avMEZOm via avBTCm → MUSD), not a BTC/MEZO peg.
 
 ##### Implementation Details: Briefly describe how the oracle is integrated into your project:
-N/A — TVL uses Ledger `totalSupply(trancheId)` mapped to native Mezo BTC / MEZO.
+N/A for TVL — uses Ledger `totalSupply(trancheId)` mapped to native Mezo BTC / MEZO (locked underlying). Market pricing for the ERC-20 wrappers should use MUSD/avBTCm `0xB018BED3b3376cE95ee34db170348FA16d18e29D` and avBTCm/avMEZOm `0xE639b9B1fb72C8ea2Fea246Ba0ad0ed7ddfB0E1C`.
 
 ##### Documentation/Proof: Provide links to documentation or any other resources that verify the oracle's usage:
 https://www.aurove.xyz/docs/protocol/overview
+https://github.com/aurove/defillama/blob/main/docs/pricing.md
 https://github.com/aurove/core
 https://github.com/aurove/id20
 
@@ -59,7 +60,7 @@ https://github.com/aurove/id20
 
 
 ##### methodology (what is being counted as tvl, how is tvl being calculated):
-TVL counts Aurove Ledger ERC-1155 `totalSupply` for managed tranches avBTCm (65540) and avMEZOm (131280), valued as native Mezo BTC and MEZO. Marked `doublecounted` because the same underlying is already included in Mezo Earn. CL pool balances are tracked under Tigris Mezo V3. This PR also adds `fixBalancesTokens` pegs for avBTCm→bitcoin and avMEZOm→mezo so Tigris Mezo V3 can price those pool sides until coins.llama.fi lists the wrappers.
+TVL counts Aurove Ledger ERC-1155 `totalSupply` for managed tranches avBTCm (65540) and avMEZOm (131280) as the underlying locked on Mezo (native BTC and MEZO). Share minting is 1:1 with locked underlying; liquid-token **market** prices are separate (avBTCm via MUSD pair; avMEZOm via avBTCm → MUSD) and should be requested via coins.llama.fi / the coin-price form. Marked `doublecounted` because the same underlying is already included in Mezo Earn. CL pool balances stay under Tigris Mezo V3 (MUSD/avBTCm already values as 2× MUSD against the core MUSD asset).
 
 ##### Github org/user (Optional, if your code is open source, we can track activity):
 aurove

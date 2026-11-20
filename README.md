@@ -8,9 +8,9 @@ Upstream PRs are opened from [`aurove/DefiLlama-Adapters`](https://github.com/au
 
 | Surface | Status | Notes |
 | --- | --- | --- |
-| Aurove protocol TVL | Adapter ready | `projects/aurove` — Ledger tranche supplies as BTC + MEZO, `doublecounted` vs Mezo Earn |
-| avBTCm / avMEZOm pricing for Mezo DEX | Peg mapping + price form | `fixBalancesTokens` pegs so **Tigris Mezo V3** values Aurove pools; submit [coin price](https://forms.defillama.com/coin-price) for market pricing |
-| Mezo CL DEX volume / fees / TVL | Already listed | Factory `0xBB24AF5c6fB88F1d191FA76055e30BF881BeEb79` as **Tigris Mezo V3** (includes Aurove pools) |
+| Aurove protocol TVL | Adapter ready | `projects/aurove` — Ledger tranche supplies as locked BTC + MEZO (1:1 wrap), `doublecounted` vs Mezo Earn |
+| avBTCm / avMEZOm **market** pricing | Coin price form | Not a BTC/MEZO peg. avBTCm via MUSD pair; avMEZOm via avBTCm → MUSD. See `docs/pricing.md` |
+| Mezo CL DEX volume / fees / TVL | Already listed | Factory `0xBB24AF5c6fB88F1d191FA76055e30BF881BeEb79` as **Tigris Mezo V3** (includes Aurove pools). MUSD/avBTCm values as 2× MUSD until coins lists wrappers |
 | Horizon (Base) | Out of scope for now | Mainnet peers/vaults not deployed |
 
 ## Contracts
@@ -47,18 +47,12 @@ Pool balances stay under **Tigris Mezo V3** (no pool2 on Aurove).
 
 ## Token pricing checklist
 
-Submit one request per token at https://forms.defillama.com/coin-price:
+Wrapping is 1:1 with locked underlying; **market price is not**. Submit one request per token at https://forms.defillama.com/coin-price (details in [`docs/pricing.md`](./docs/pricing.md)):
 
-1. **avBTCm** — `mezo:0xf333171788dE7005695b2E8FB9cAE97Ba9c4dD7a`
-   - Backing: 1:1 Ledger/managed veBTC
-   - Pool: MUSD/avBTCm `0xB018BED3b3376cE95ee34db170348FA16d18e29D`
-   - Explorer: https://explorer.mezo.org/token/0xf333171788dE7005695b2E8FB9cAE97Ba9c4dD7a
-2. **avMEZOm** — `mezo:0xb894b11A78B762c82Cb095148F5BC11DC93C3560`
-   - Backing: 1:1 Ledger/managed veMEZO
-   - Pool: avBTCm/avMEZOm `0xE639b9B1fb72C8ea2Fea246Ba0ad0ed7ddfB0E1C`
-   - Explorer: https://explorer.mezo.org/token/0xb894b11A78B762c82Cb095148F5BC11DC93C3560
+1. **avBTCm** — price from MUSD/avBTCm `0xB018BED3b3376cE95ee34db170348FA16d18e29D`
+2. **avMEZOm** — price from avBTCm/avMEZOm `0xE639b9B1fb72C8ea2Fea246Ba0ad0ed7ddfB0E1C`, then avBTCm → MUSD
 
-Until those land, the adapter PR’s `fixBalancesTokens` pegs keep Tigris pool TVL from zeroing the wrapper sides.
+Until coins.llama.fi lists them, Tigris still values MUSD/avBTCm as 2× MUSD; the avBTCm/avMEZOm pool needs the coin prices above.
 
 ## Links
 
