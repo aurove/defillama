@@ -8,8 +8,8 @@ Upstream PRs are opened from [`aurove/DefiLlama-Adapters`](https://github.com/au
 
 | Surface | Status | Notes |
 | --- | --- | --- |
-| Aurove protocol TVL | Adapter ready | `projects/aurove` — Ledger tranche supplies as locked BTC + MEZO (1:1 wrap), `doublecounted` vs Mezo Earn |
-| avBTCm / avMEZOm **market** pricing | Coin price form | Not a BTC/MEZO peg. avBTCm via MUSD pair; avMEZOm via avBTCm → MUSD. See `docs/pricing.md` |
+| Aurove protocol TVL | Adapter ready | `projects/aurove` — Ledger tranche supplies × Id20 **pool** prices (→ MUSD), `doublecounted` vs Mezo Earn |
+| avBTCm / avMEZOm **market** pricing | Coin price form + on-chain in TVL | Not a BTC/MEZO peg. TVL already uses pool `slot0`; coins.llama.fi still needed for Tigris. See `docs/pricing.md` |
 | Mezo CL DEX volume / fees / TVL | Already listed | Factory `0xBB24AF5c6fB88F1d191FA76055e30BF881BeEb79` as **Tigris Mezo V3** (includes Aurove pools). MUSD/avBTCm values as 2× MUSD until coins lists wrappers |
 | Horizon (Base) | Out of scope for now | Mainnet peers/vaults not deployed |
 
@@ -28,7 +28,7 @@ Upstream PRs are opened from [`aurove/DefiLlama-Adapters`](https://github.com/au
 
 ## Methodology
 
-Aurove TVL = `Ledger.totalSupply(65540)` as Mezo BTC + `Ledger.totalSupply(131280)` as MEZO.
+Aurove TVL = `Ledger.totalSupply(65540)` (avBTCm) + `Ledger.totalSupply(131280)` (avMEZOm), valued at **Id20 CL pool mids** (converted to MUSD via MUSD/avBTCm and avBTCm/avMEZOm `slot0`), not BTC/MEZO spot pegs. Shares remain 1:1 claims on locked underlying but trade off-peg.
 
 Shares mint 1:1 with underlying locked into Mezo Earn managed veNFTs, so the adapter sets `doublecounted: true`.
 

@@ -1,3 +1,15 @@
+# Protocol TVL valuation
+
+Aurove Ledger managed supply is valued at **Id20 pool market prices**, not BTC/MEZO spot pegs:
+
+- Quantity: `Ledger.totalSupply(65540)` (avBTCm) + `Ledger.totalSupply(131280)` (avMEZOm)
+- Price: MUSD/avBTCm and avBTCm/avMEZOm CL pool `slot0` mids, converted to MUSD (MUSD ≈ $1)
+- `doublecounted: true` vs Mezo Earn (same underlying locks); CL pool balances stay under Tigris Mezo V3
+
+Adapter: `adapters/aurove/index.js` (mirrored in DefiLlama-Adapters `projects/aurove`).
+
+---
+
 # Coin price requests
 
 Form: [https://forms.defillama.com/coin-price](https://forms.defillama.com/coin-price)  
