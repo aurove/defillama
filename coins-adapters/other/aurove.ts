@@ -83,12 +83,12 @@ async function getTokenPrices(timestamp: number) {
     [AVMEZOM]: { underlying: MUSD, price: avmezomInMusd },
   };
 
-  // Thin Mezo CL pools — keep confidence below bluechips but high enough to publish
+  // Mezo CL pools are thin; keep confidence below bluechips but publishable
   return getWrites({
     chain,
     timestamp,
     pricesObject,
     projectName,
-    confidence: 0.8,
+    confidence: 0.7,
   });
 }
