@@ -9,7 +9,7 @@ Upstream PRs are opened from [`aurove/DefiLlama-Adapters`](https://github.com/au
 | Surface | Status | Notes |
 | --- | --- | --- |
 | Aurove protocol TVL | Adapter ready | `projects/aurove` — Ledger tranche supplies × Id20 **pool** prices (→ MUSD), `doublecounted` vs Mezo Earn |
-| avBTCm / avMEZOm **market** pricing | Coin price form + on-chain in TVL | Not a BTC/MEZO peg. TVL already uses pool `slot0`; coins.llama.fi still needed for Tigris. See `docs/pricing.md` |
+| avBTCm / avMEZOm **market** pricing | Coins adapter ready | [`coins-adapters/other/aurove.ts`](./coins-adapters/other/aurove.ts) → private `defillama-server`. Form copy in `docs/pricing.md`. Needed so Tigris prices both Id20 legs. |
 | Mezo CL DEX volume / fees / TVL | Already listed | Factory `0xBB24AF5c6fB88F1d191FA76055e30BF881BeEb79` as **Tigris Mezo V3** (includes Aurove pools). MUSD/avBTCm values as 2× MUSD until coins lists wrappers |
 | Horizon (Base) | Out of scope for now | Mainnet peers/vaults not deployed |
 

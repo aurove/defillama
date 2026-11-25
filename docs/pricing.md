@@ -10,10 +10,32 @@ Adapter: `adapters/aurove/index.js` (mirrored in DefiLlama-Adapters `projects/au
 
 ---
 
-# Coin price requests
+# Coin price adapters (preferred)
+
+Working adapter: [`coins-adapters/other/aurove.ts`](../coins-adapters/other/aurove.ts)
+
+Upstream path (private repo): `DefiLlama/defillama-server` → `coins/src/adapters/other/aurove.ts`  
+Register: `aurove: require("./other/aurove")` in `coins/src/adapters/index.ts`
+
+Prices both wrappers against already-listed Mezo MUSD via Tigris CL `slot0`:
+
+| Token | Path |
+| --- | --- |
+| avBTCm | MUSD/avBTCm `0xB018…` → MUSD |
+| avMEZOm | avBTCm/avMEZOm `0xE639…` → avBTCm → MUSD |
+
+`unknownTokensV3` is single-hop only, so avMEZOm cannot wait on an in-batch avBTCm write — both legs settle to MUSD in this adapter.
+
+Test upstream: `LOCAL_TEST=true ts-node coins/src/test.ts aurove`
+
+Related TVL PR (pool market prices): https://github.com/DefiLlama/DefiLlama-Adapters/pull/22386
+
+---
+
+# Coin price requests (form)
 
 Form: [https://forms.defillama.com/coin-price](https://forms.defillama.com/coin-price)  
-One token per submission. Cloudflare Turnstile must be completed before Submit works.
+One token per submission. Cloudflare Turnstile must be completed before Submit works. Prefer landing the adapter above; use the form when `defillama-server` access is unavailable.
 
 DefiLlama currently returns no price for either wrapper:
 
@@ -96,7 +118,7 @@ Do **not** pick “Same price as a token you already cover” for these wrappers
 - **Where is this visible on DefiLlama, and how much value does it affect?**
 
 ```text
-https://defillama.com/protocol/tigris-mezo-v3 and https://defillama.com/chain/mezo — avBTCm is token1 in the Mezo Tigris CL MUSD/avBTCm pool. Without a coins.llama.fi price the wrapper leg reads $0 and undercounts that pool (recently ~$413 TVL, ~$1.2k 24h volume one-side via Mezo pools API). Also needed for Aurove Mezo CL balances once listed: https://github.com/DefiLlama/DefiLlama-Adapters/pull/22323
+https://defillama.com/protocol/tigris-mezo-v3 and https://defillama.com/chain/mezo — avBTCm is token1 in the Mezo Tigris CL MUSD/avBTCm pool. Without a coins.llama.fi price the wrapper leg reads $0 and undercounts that pool (recently ~$413 TVL, ~$1.2k 24h volume one-side via Mezo pools API). Also needed for Aurove Mezo CL balances / Tigris TVL. Pool-price TVL PR: https://github.com/DefiLlama/DefiLlama-Adapters/pull/22386
 ```
 
 ### The price source
@@ -111,6 +133,7 @@ Recent Mezo API (https://api.mezo.org/pools?filter=none): TVL ~$413, 24h volume 
 token0 MUSD 0xdD468A1DDc392dcdbEf6db6e34E89AA338F9F186 (already priced on coins.llama.fi).
 token1 avBTCm 0xf333171788dE7005695b2E8FB9cAE97Ba9c4dD7a.
 Derive avBTCm USD from this MUSD pair. Do not use a 1:1 BTC peg — market trades below BTC spot.
+Ready adapter: https://github.com/aurove/defillama/blob/main/coins-adapters/other/aurove.ts (register as aurove in coins/src/adapters/index.ts).
 ```
 
 - **Other addresses the same source covers (optional):** _(leave blank)_
@@ -120,7 +143,7 @@ Derive avBTCm USD from this MUSD pair. Do not use a 1:1 BTC peg — market trade
 - **Notes (optional):**
 
 ```text
-Aurove liquid managed-BTC ERC-20 (ID20). Wrap vs locked BTC is 1:1 on the ledger, but market price is the MUSD/avBTCm pool (~$58k recently vs BTC spot ~$62k). Do not redirect to coingecko:bitcoin. Companion request for avMEZOm prices via avBTCm→MUSD. TVL adapter PR: https://github.com/DefiLlama/DefiLlama-Adapters/pull/22323
+Aurove liquid managed-BTC ERC-20 (ID20). Wrap vs locked BTC is 1:1 on the ledger, but market price is the MUSD/avBTCm pool (~$58k recently vs BTC spot ~$62k). Do not redirect to coingecko:bitcoin. Companion request for avMEZOm prices via avBTCm→MUSD. Coins adapter: https://github.com/aurove/defillama/tree/main/coins-adapters — TVL PR: https://github.com/DefiLlama/DefiLlama-Adapters/pull/22386
 ```
 
 - **Your email (optional):** `brightomex@gmail.com`
@@ -142,7 +165,7 @@ Aurove liquid managed-BTC ERC-20 (ID20). Wrap vs locked BTC is 1:1 on the ledger
 - **Where is this visible on DefiLlama, and how much value does it affect?**
 
 ```text
-https://defillama.com/protocol/tigris-mezo-v3 and https://defillama.com/chain/mezo — avMEZOm is token0 in the Mezo Tigris CL avBTCm/avMEZOm pool. Without a coins price that pool undercounts (recently ~$127 TVL; ~$0.5k–$1.3k 24h volume across sides). Also needed for Aurove listing PR https://github.com/DefiLlama/DefiLlama-Adapters/pull/22323
+https://defillama.com/protocol/tigris-mezo-v3 and https://defillama.com/chain/mezo — avMEZOm is token0 in the Mezo Tigris CL avBTCm/avMEZOm pool. Without a coins price that pool undercounts (recently ~$127 TVL; ~$0.5k–$1.3k 24h volume across sides). Also needed for Aurove / Tigris Mezo V3. Pool-price TVL PR: https://github.com/DefiLlama/DefiLlama-Adapters/pull/22386
 ```
 
 ### The price source
@@ -156,16 +179,21 @@ Explorer: https://explorer.mezo.org/address/0xE639b9B1fb72C8ea2Fea246Ba0ad0ed7dd
 Recent Mezo API (https://api.mezo.org/pools?filter=none): TVL ~$127, 24h volume ~$542 avMEZOm side / ~$1.28k avBTCm side.
 token0 avMEZOm 0xb894b11A78B762c82Cb095148F5BC11DC93C3560; token1 avBTCm 0xf333171788dE7005695b2E8FB9cAE97Ba9c4dD7a.
 Price avBTCm first from MUSD/avBTCm https://mezo.org/earn/pools?address=0xB018BED3b3376cE95ee34db170348FA16d18e29D (MUSD already priced), then avMEZOm via this pool (avMEZOm → avBTCm → MUSD). Do not use a 1:1 MEZO peg.
+Ready adapter (prices both wrappers vs MUSD in one run): https://github.com/aurove/defillama/blob/main/coins-adapters/other/aurove.ts
 ```
 
-- **Other addresses the same source covers (optional):** _(leave blank)_
+- **Other addresses the same source covers (optional):**
+
+```text
+mezo:0xf333171788dE7005695b2E8FB9cAE97Ba9c4dD7a
+```
 
 ### Anything else
 
 - **Notes (optional):**
 
 ```text
-Aurove liquid managed-MEZO ERC-20 (ID20). Wrap vs locked MEZO is 1:1 on the ledger, but market price is via avBTCm/avMEZOm then avBTCm/MUSD. Do not redirect to coingecko:mezo. Companion request filed for avBTCm. TVL adapter PR: https://github.com/DefiLlama/DefiLlama-Adapters/pull/22323
+Aurove liquid managed-MEZO ERC-20 (ID20). Wrap vs locked MEZO is 1:1 on the ledger, but market price is via avBTCm/avMEZOm then avBTCm/MUSD. Do not redirect to coingecko:mezo. Companion request filed for avBTCm. Coins adapter: https://github.com/aurove/defillama/tree/main/coins-adapters — TVL PR: https://github.com/DefiLlama/DefiLlama-Adapters/pull/22386
 ```
 
 - **Your email (optional):** `brightomex@gmail.com`
@@ -177,5 +205,6 @@ Aurove liquid managed-MEZO ERC-20 (ID20). Wrap vs locked MEZO is 1:1 on the ledg
 
 Filled both submissions against the live form (lookup verdict **unpriced** for each). Automated Submit is blocked by Cloudflare Turnstile in headless browsers — complete the Turnstile challenge in a normal browser and click **Submit request** using the values above.
 
-Optional faster path after triage: a coins adapter PR against  
-https://github.com/DefiLlama/defillama-server/tree/master/coins/src/adapters
+Preferred path: land [`coins-adapters/other/aurove.ts`](../coins-adapters/other/aurove.ts) into  
+https://github.com/DefiLlama/defillama-server/tree/master/coins/src/adapters  
+(`defillama-server` is private — share the mirror with maintainers or open a PR once you have repo access).
